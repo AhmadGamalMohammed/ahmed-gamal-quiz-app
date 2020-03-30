@@ -4,17 +4,18 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  AsyncStorage
-
+  AsyncStorage,
+  Alert
 } from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Colors from '../constants/Colors'
 
 const IntroScreen = props => {
   const [today, setToday] = useState('');
   const [scoreState, setScoreState] = useState(0);
+
+  ///////   get current day name  ///////
   const getDayName = () => {
     var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var today = new Date();
@@ -25,11 +26,13 @@ const IntroScreen = props => {
 
   const loadInitialData = useCallback(async () => {
     getDayName();
+
+    ///////   save the score in async storage  ///////
     const scoreStorage = await AsyncStorage.getItem('score');
-    if (scoreStorage) { 
+    if (scoreStorage) {
       setScoreState(scoreStorage);
     }
-    
+
   }, [today]);
 
   useEffect(() => {
@@ -72,9 +75,9 @@ const IntroScreen = props => {
           <View style={styles.counterContainer}>
 
             <CountDown
-              until={20}
-              onFinish={() => { }}
-              onPress={() => alert('hello')}
+              until={1000}
+              onFinish={() => {Alert.alert('Quiz App' , 'Time out for this quiz' ) }}
+              onPress={() => {}}
               size={20}
               digitStyle={styles.counterStyle}
             />

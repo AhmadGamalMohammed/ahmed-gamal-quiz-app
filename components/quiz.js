@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
-  Button,
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  AsyncStorage
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CountDown from 'react-native-countdown-component';
@@ -90,8 +87,11 @@ const jsonData = {
 export default class Quiz extends Component {
   constructor(props) {
     super(props);
-    this.qno = 0
-    this.score = 0
+    this.qno = 0;
+    this.score = 0;
+    this.currentAnswer = false;
+    this.isAnswered = 0 ;
+
 
     const jdata = jsonData.quiz.quiz1
     arrnew = Object.keys(jdata).map(function (k) { return jdata[k] });
@@ -105,47 +105,65 @@ export default class Quiz extends Component {
       status: "q1"
     }
   }
+
+   ////////////    function to press back button icon    //////////////
   _onPressBack() {
-    const { goBack } = this.props.navigation
-    goBack()
+    this.props.navigation.pop();
   }
+
+  ////////////    function to fire when press submit    //////////////
   next() {
-    if (this.qno < arrnew.length - 1) {
-      this.qno++
-      this.setState({
-        countCheck: 0,
-        question: arrnew[this.qno].question,
-        options: arrnew[this.qno].options,
-        correctoption: arrnew[this.qno].correctoption,
-        questionId: arrnew[this.qno].question_id,
-        question_posints: arrnew[this.qno].question_posints,
-        status: arrnew[this.qno].question_id
-      })
-    } else {
-      this.props.quizFinish(this.score);
+    /// check if the user select an option or not 
+    if (this.isAnswered != 0) {
+      this.isAnswered = false;
+
+      // check if the option is true then increase the score by 10 
+      if (this.currentAnswer == 1) { 
+        this.score += 10;
+        this.currentAnswer = 0;
+      }
+      if (this.qno < arrnew.length - 1) {
+        this.qno++
+        this.setState({
+          countCheck: 0,
+          question: arrnew[this.qno].question,
+          options: arrnew[this.qno].options,
+          correctoption: arrnew[this.qno].correctoption,
+          questionId: arrnew[this.qno].question_id,
+          question_posints: arrnew[this.qno].question_posints,
+          status: arrnew[this.qno].question_id
+        })
+      } else {
+        this.props.quizFinish(this.score);
+      }
     }
+    
   }
+
+  ////////////    handler when timer get out     //////////////
   timeOut() {
     this.props.quizFinish(this.score)
   }
+
+////////////    function to detect when the user press on option      //////////////
   _answer(status, ans) {
     if (status == true) {
-      // this.setState({ status: true });
+      this.isAnswered = 1 ;
       const count = this.state.countCheck + 1;
       this.setState({ countCheck: count })
       if (ans == this.state.correctoption) {
-        this.score += 10;
+        this.currentAnswer = 1;
       }
     } else {
-      // this.setState({ status: false });
+      this.isAnswered = 0 ;
       const count = this.state.countCheck - 1
-      this.setState({ countCheck: count })
+      this.setState({ countCheck: count });
       if (this.state.countCheck < 1 || ans == this.state.correctoption) {
-        this.score -= 10;
+        this.currentAnswer = 0;
       }
     }
-
   }
+
   render() {
     let _this = this
     const currentOptions = this.state.options
@@ -153,7 +171,7 @@ export default class Quiz extends Component {
       return (
         <View key={k} style={{ margin: 12 }}>
           <Animbutton
-            countCheck={_this.state.countCheck} 
+            countCheck={_this.state.countCheck}
             onColor={"#5950f5"}
             effect={"tada"}
             _onPress={(status) => _this._answer(status, k)}

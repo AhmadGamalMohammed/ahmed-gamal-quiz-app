@@ -6,7 +6,6 @@ import {
   View,
   Text,
   AsyncStorage,
-  Button
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -19,16 +18,22 @@ export default class Playquiz extends Component {
       score: 0
     }
   }
+
+  ////////////    function to press back button icon    //////////////
   _onPressBack() {
     const { goBack } = this.props.navigation
     goBack()
   }
+
+  ////////////    when quiz get finished and save the score    //////////////
   _quizFinish = async (score) => {
     this.setState({ quizFinish: true, score: score })
     await AsyncStorage.setItem('score', score.toString());
   }
+
+    ////////////    define the score message    //////////////
   _scoreMessage(score) {
-    if (score <= 30) {
+    if (score <= 10) {
       return (<View style={styles.innerContainer} >
         <View style={{ flexDirection: "row" }} >
           <Icon name="trophy" size={30} color="white" />
@@ -36,7 +41,7 @@ export default class Playquiz extends Component {
         <Text style={styles.score}>You need to work hard</Text>
         <Text style={styles.score}>You scored {score} coins</Text>
       </View>)
-    } else if (score > 30 && score < 60) {
+    } else if (score > 10 && score < 40) {
       return (<View style={styles.innerContainer} >
         <View style={{ flexDirection: "row" }} >
           <Icon name="trophy" size={30} color="white" />
@@ -45,7 +50,7 @@ export default class Playquiz extends Component {
         <Text style={styles.score}>You are good</Text>
         <Text style={styles.score}>Congrats you scored {score} coins</Text>
       </View>)
-    } else if (score >= 60) {
+    } else if (score >= 40) {
       return (<View style={styles.innerContainer}>
         <View style={{ flexDirection: "row" }} >
           <Icon name="trophy" size={30} color="white" />
@@ -57,6 +62,7 @@ export default class Playquiz extends Component {
       </View>)
     }
   }
+
   render() {
     return (
       <LinearGradient colors={['#1f9af0', '#6c22cf', '#6c22cf']} style={styles.screen}>
@@ -77,7 +83,7 @@ export default class Playquiz extends Component {
             </View>
           </View>
           :
-          <Quiz quizFinish={(score) => this._quizFinish(score)} />}
+          <Quiz navigation={this.props.navigation} quizFinish={(score) => this._quizFinish(score)} />}
       </LinearGradient>
     );
   }
